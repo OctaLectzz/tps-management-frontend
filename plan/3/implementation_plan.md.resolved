@@ -1,0 +1,36 @@
+# Implementation Plan - Sidebar Categorization and Vote Result Input
+
+Add a new menu for inputting vote results and reorganize the sidebar into logical categories (General, Master Data, Operations) to improve UX and scalability.
+
+## User Review Required
+
+> [!IMPORTANT]
+> The sidebar will be restructured from a flat list to a categorized list. This will change the visual layout of the navigation.
+
+## Proposed Changes
+
+### [Frontend]
+
+#### [NEW] [vote-result-input.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/pages/vote-result-input.tsx)
+- Create a new page with a form to input vote results (TPS selection, PAN votes, total votes, DPT, voters present, etc.).
+- Use existing UI components like `Card`, `Button`, `Input`, `Select`.
+
+#### [MODIFY] [router.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/routes/router.tsx)
+- Register the new `/vote-results/input` route.
+
+#### [MODIFY] [sidebar.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/components/layout/sidebar.tsx)
+- Refactor the `navItems` to include categories.
+- Update the rendering logic to display category headers and grouped items.
+
+#### [MODIFY] [id.json](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/i18n/locales/id.json) & [en.json](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/i18n/locales/en.json)
+- Add translation keys for sidebar categories: `nav.categories.main`, `nav.categories.data`, `nav.categories.operations`.
+- Add translation key for the new menu: `nav.inputVoteResult`.
+
+## Verification Plan
+
+### Manual Verification
+- Verify the sidebar displays categories correctly.
+- Verify the "Input Hasil Suara" menu navigates to the correct page.
+- Verify the Vote Result Input form works (submitting data to the backend).
+- Check responsiveness on mobile and desktop.
+- Verify translation switching (English/Indonesian) works for new menus and categories.

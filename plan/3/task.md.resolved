@@ -1,0 +1,5 @@
+- [x] Update translations (id.json and en.json)
+- [x] Refactor Sidebar component with categories
+- [x] Create Vote Result Input page
+- [x] Register new route in router.tsx
+- [x] Verify functionality

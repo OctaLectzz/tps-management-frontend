@@ -1,9 +1,9 @@
 import { cn } from '@/lib/utils'
 import React from 'react'
 
-type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info' | 'outline'
+type BadgeVariant = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'outline'
 
-interface BadgeProps {
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant
   size?: 'sm' | 'md'
   dot?: boolean
@@ -13,6 +13,7 @@ interface BadgeProps {
 
 const variantStyles: Record<BadgeVariant, string> = {
   default: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+  primary: 'bg-(--color-primary-bg) text-(--color-primary-text)',
   success: 'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400',
   warning: 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400',
   danger: 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400',
@@ -22,6 +23,7 @@ const variantStyles: Record<BadgeVariant, string> = {
 
 const dotColors: Record<BadgeVariant, string> = {
   default: 'bg-gray-500',
+  primary: 'bg-(--color-primary)',
   success: 'bg-green-500',
   warning: 'bg-amber-500',
   danger: 'bg-red-500',
@@ -34,7 +36,7 @@ const sizeStyles: Record<'sm' | 'md', string> = {
   md: 'px-2.5 py-1 text-xs'
 }
 
-const Badge: React.FC<BadgeProps> = ({ variant = 'default', size = 'sm', dot = false, children, className }) => {
+const Badge: React.FC<BadgeProps> = ({ variant = 'default', size = 'sm', dot = false, children, className, ...props }) => {
   return (
     <span
       className={cn(
@@ -43,6 +45,7 @@ const Badge: React.FC<BadgeProps> = ({ variant = 'default', size = 'sm', dot = f
         sizeStyles[size],
         className
       )}
+      {...props}
     >
       {dot && <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', dotColors[variant])} />}
       {children}

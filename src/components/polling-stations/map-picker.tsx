@@ -39,12 +39,15 @@ const SUKOHARJO_CENTER: [number, number] = [-7.6855, 110.8419]
 
 const MapPicker: React.FC<MapPickerProps> = ({ latitude, longitude, onChange, className, height = '250px' }) => {
   const { t } = useTranslation()
-  const [position, setPosition] = useState<[number, number] | null>(latitude && longitude ? [latitude, longitude] : null)
+  const [position, setPosition] = useState<[number, number] | null>(null)
 
   // Sync external prop changes
   useEffect(() => {
-    if (latitude && longitude) {
-      setPosition([latitude, longitude])
+    const lat = typeof latitude === 'string' ? parseFloat(latitude) : latitude
+    const lng = typeof longitude === 'string' ? parseFloat(longitude) : longitude
+
+    if (typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
+      setPosition([lat, lng])
     }
   }, [latitude, longitude])
 
@@ -66,7 +69,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ latitude, longitude, onChange, cl
           <MapPin className="h-4 w-4" />
           {t('pollingStations.pickLocation')}
         </label>
-        {position && (
+        {position && typeof position[0] === 'number' && typeof position[1] === 'number' && (
           <span className="font-mono text-xs text-(--color-text-muted)">
             {position[0].toFixed(6)}, {position[1].toFixed(6)}
           </span>

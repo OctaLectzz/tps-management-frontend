@@ -59,8 +59,14 @@
     "officers": "Officers",
     "assignments": "Assignments",
     "voteResults": "Vote Results",
+    "inputVoteResult": "Input Vote Results",
     "reports": "Reports",
-    "settings": "Settings"
+    "settings": "Settings",
+    "categories": {
+      "main": "Main Menu",
+      "data": "Data Management",
+      "operations": "Operations"
+    }
   },
   "auth": {
     "login": "Sign In",
@@ -90,7 +96,16 @@
     "addOfficer": "Add Officer",
     "covered": "Covered",
     "uncovered": "Uncovered",
-    "districtOverview": "District Overview"
+    "districtOverview": "District Overview",
+    "inputResults": "Input Results",
+    "inputResultsDesc": "Record PAN votes from every polling station across Sukoharjo.",
+    "monitorProgress": "Monitor Progress",
+    "monitorProgressDesc": "View real-time visualization of incoming reports on the map.",
+    "verifyC1": "Verify C1",
+    "verifyC1Desc": "Validate report consistency with physical C1 forms.",
+    "total": "Total",
+    "manageAssignments": "Manage Assignments",
+    "quickLinksDesc": "Manage daily operations quickly via the shortcuts below."
   },
   "pollingStations": {
     "title": "TPS Management",
@@ -206,17 +221,31 @@
     "title": "Map View",
     "description": "Geographic view of all polling stations",
     "filters": "Map Filters",
-    "showMarkers": "Show Markers",
     "showBoundaries": "Show Boundaries",
     "legend": "Legend",
-    "hasOfficer": "Has Officer",
-    "noOfficer": "No Officer",
     "underReview": "Under Review",
-    "covered": "Covered",
     "partial": "Partial",
     "uncovered": "Uncovered",
     "viewDetails": "View Details",
-    "stationInfo": "Station Information"
+    "stationInfo": "Station Info",
+    "totalTps": "Total TPS",
+    "hasOfficer": "Covered by Officers",
+    "noOfficer": "Needs Officers",
+    "coverage": "Coverage Percentage",
+    "searchPlaceholder": "Search station number, village, or venue...",
+    "showMarkers": "Show Markers",
+    "covered": "COVERED",
+    "notCovered": "NOT YET",
+    "filteredList": "Filtered TPS List",
+    "guideTitle": "Guide & Tips",
+    "markerColor": "Marker Color",
+    "markerColorDesc": "Green marker indicates TPS already has an officer. Red marker indicates a critical TPS without a person in charge.",
+    "quickNav": "Quick Navigation",
+    "quickNavDesc": "Click on a TPS card in the list to automatically move the map focus to that location.",
+    "importantInfo": "Important Info",
+    "importantInfoDesc": "Use the district filter and search box to narrow down your monitoring area in real-time.",
+    "needHelp": "Need Help?",
+    "helpText": "Contact the regional coordinator if you find incorrect coordinate data in the field."
   },
   "validation": {
     "required": "This field is required",

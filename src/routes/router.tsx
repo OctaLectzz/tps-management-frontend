@@ -11,6 +11,7 @@ const MapViewPage = React.lazy(() => import('@/pages/map-view'))
 const OfficersPage = React.lazy(() => import('@/pages/officers'))
 const AssignmentsPage = React.lazy(() => import('@/pages/assignments'))
 const VoteResultsPage = React.lazy(() => import('@/pages/vote-results'))
+const VoteResultInputPage = React.lazy(() => import('@/pages/vote-result-input'))
 
 // Auth guard component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -104,6 +105,14 @@ export const router = createBrowserRouter([
         element: (
           <SuspenseWrap>
             <VoteResultsPage />
+          </SuspenseWrap>
+        )
+      },
+      {
+        path: 'vote-result-input',
+        element: (
+          <SuspenseWrap>
+            <VoteResultInputPage />
           </SuspenseWrap>
         )
       }

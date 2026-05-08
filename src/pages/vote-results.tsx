@@ -1,13 +1,16 @@
 import { PageHeader } from '@/components/common/page-header'
-import { Badge, Card, SkeletonCard, Spinner, Tabs } from '@/components/ui'
-import { useVoteResultAggregation, useVoteResults } from '@/hooks/use-vote-results'
+import { Badge, Button, Card, SkeletonCard, Spinner, Tabs, useToast } from '@/components/ui'
+import { useVerifyVoteResult, useVoteResultAggregation, useVoteResults } from '@/hooks/use-vote-results'
 import { formatNumber } from '@/lib/utils'
+import { Check, Plus } from 'lucide-react'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 const VoteResultsPage: React.FC = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('aggregated')
 
   const tabs = [
@@ -17,7 +20,15 @@ const VoteResultsPage: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <PageHeader title={t('voteResults.title')} description={t('voteResults.description')} />
+      <PageHeader
+        title={t('voteResults.title')}
+        description={t('voteResults.description')}
+        actions={
+          <Button icon={<Plus className="h-4 w-4" />} size="sm" onClick={() => navigate('/vote-result-input')}>
+            {t('voteResults.addResult')}
+          </Button>
+        }
+      />
 
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
@@ -170,7 +181,18 @@ const AggregatedView: React.FC = () => {
 /* ===== Detailed View ===== */
 const DetailedView: React.FC = () => {
   const { t } = useTranslation()
+  const { toast } = useToast()
   const { data, isLoading } = useVoteResults({ per_page: 20 })
+  const verifyMutation = useVerifyVoteResult()
+
+  const handleVerify = async (id: number) => {
+    try {
+      await verifyMutation.mutateAsync(id)
+      toast({ type: 'success', title: t('voteResults.verified') })
+    } catch {
+      toast({ type: 'error', title: t('notifications.error') })
+    }
+  }
 
   if (isLoading)
     return (
@@ -191,6 +213,7 @@ const DetailedView: React.FC = () => {
               <th className="px-4 py-3 text-right text-xs font-semibold text-(--color-text-muted) uppercase">{t('voteResults.dpt')}</th>
               <th className="px-4 py-3 text-right text-xs font-semibold text-(--color-text-muted) uppercase">{t('voteResults.votersPresent')}</th>
               <th className="px-4 py-3 text-center text-xs font-semibold text-(--color-text-muted) uppercase">{t('voteResults.verified')}</th>
+              <th className="px-4 py-3 text-right text-xs font-semibold text-(--color-text-muted) uppercase">{t('common.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -207,6 +230,19 @@ const DetailedView: React.FC = () => {
                   <Badge variant={vr.verified ? 'success' : 'warning'} size="sm">
                     {vr.verified ? t('voteResults.verified') : t('voteResults.unverified')}
                   </Badge>
+                </td>
+                <td className="px-4 py-3 text-right">
+                  {!vr.verified && (
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      icon={<Check className="h-3 w-3" />}
+                      onClick={() => handleVerify(vr.id)}
+                      loading={verifyMutation.isPending && verifyMutation.variables === vr.id}
+                    >
+                      {t('common.confirm')}
+                    </Button>
+                  )}
                 </td>
               </tr>
             ))}

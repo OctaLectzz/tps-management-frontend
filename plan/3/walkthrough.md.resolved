@@ -1,0 +1,39 @@
+# Walkthrough - Sidebar Categorization and Vote Result Input
+
+I have successfully added the vote result input functionality and reorganized the sidebar navigation.
+
+## Changes Made
+
+### 1. Sidebar Categorization
+The sidebar has been restructured into logical categories to improve usability as the application grows:
+- **Main Menu**: Dashboard and Map View.
+- **Data Management**: Polling Stations and Officers.
+- **Operations**: Assignments, Vote Results, and the new Input Vote Results.
+
+### 2. Vote Result Input Page
+- Created a new dedicated page at `/vote-results/input`.
+- Implemented a reusable `VoteResultForm` component using `react-hook-form` and Zod validation.
+- The form allows selecting a Polling Station and inputting PAN votes, total votes, DPT, and voters present.
+- Added a "Input Hasil" button in the `Vote Results` view for quick access.
+
+### 3. Internationalization (i18n)
+- Added new translation keys for categories and menus in both Indonesian (`id.json`) and English (`en.json`).
+- Ensured all new UI elements are fully translated.
+
+### 4. Code Quality & Reusability
+- Refactored `Sidebar` to use a data-driven approach for categories.
+- Created `VoteResultForm` as a standalone component that can be used for both creation and editing.
+
+## Verification Results
+
+### Sidebar
+- Categories are displayed with clear headers.
+- Active state works correctly for all menu items.
+
+### Vote Result Input
+- Form validation works (prevents negative numbers, requires selection).
+- Successfully integrates with the backend API via existing hooks.
+- Success toast appears upon submission.
+
+### Routing
+- `/vote-results/input` is correctly registered and protected by auth guards.

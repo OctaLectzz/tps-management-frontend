@@ -38,3 +38,14 @@ export function useUpdateVoteResult() {
     }
   })
 }
+
+export function useVerifyVoteResult() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => voteResultService.verify(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.voteResults.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all })
+    }
+  })
+}

@@ -59,8 +59,14 @@
     "officers": "Petugas",
     "assignments": "Penugasan",
     "voteResults": "Hasil Suara",
+    "inputVoteResult": "Input Hasil Suara",
     "reports": "Laporan",
-    "settings": "Pengaturan"
+    "settings": "Pengaturan",
+    "categories": {
+      "main": "Menu Utama",
+      "data": "Manajemen Data",
+      "operations": "Operasional"
+    }
   },
   "auth": {
     "login": "Masuk",
@@ -90,7 +96,16 @@
     "addOfficer": "Tambah Petugas",
     "covered": "Tertangani",
     "uncovered": "Belum Tertangani",
-    "districtOverview": "Ringkasan Kecamatan"
+    "districtOverview": "Ringkasan Kecamatan",
+    "inputResults": "Input Hasil",
+    "inputResultsDesc": "Catat perolehan suara PAN dari setiap TPS di seluruh Sukoharjo.",
+    "monitorProgress": "Pantau Progress",
+    "monitorProgressDesc": "Lihat visualisasi data laporan yang masuk secara real-time di peta.",
+    "verifyC1": "Verifikasi C1",
+    "verifyC1Desc": "Validasi kesesuaian data yang dikirim saksi dengan form C1 fisik.",
+    "total": "Total",
+    "manageAssignments": "Kelola Penugasan",
+    "quickLinksDesc": "Kelola operasional harian dengan cepat melalui pintasan di bawah ini."
   },
   "pollingStations": {
     "title": "Manajemen TPS",
@@ -206,17 +221,31 @@
     "title": "Peta",
     "description": "Tampilan geografis semua TPS",
     "filters": "Filter Peta",
-    "showMarkers": "Tampilkan Penanda",
     "showBoundaries": "Tampilkan Batas Wilayah",
     "legend": "Legenda",
-    "hasOfficer": "Ada Petugas",
-    "noOfficer": "Tidak Ada Petugas",
     "underReview": "Dalam Peninjauan",
-    "covered": "Tertangani",
     "partial": "Sebagian",
     "uncovered": "Belum Tertangani",
     "viewDetails": "Lihat Detail",
-    "stationInfo": "Informasi TPS"
+    "stationInfo": "Informasi TPS",
+    "totalTps": "Total TPS",
+    "hasOfficer": "Tercakup Petugas",
+    "noOfficer": "Belum Ada Petugas",
+    "coverage": "Persentase Cakupan",
+    "searchPlaceholder": "Cari nomor TPS, desa, atau nama tempat...",
+    "showMarkers": "Tampilkan Marker",
+    "covered": "TERKAVER",
+    "notCovered": "BELUM",
+    "filteredList": "Daftar TPS Terfilter",
+    "guideTitle": "Panduan & Tips",
+    "markerColor": "Warna Marker",
+    "markerColorDesc": "Marker Hijau menunjukkan TPS sudah memiliki petugas. Marker Merah menunjukkan TPS kritis yang belum memiliki penanggung jawab.",
+    "quickNav": "Navigasi Cepat",
+    "quickNavDesc": "Klik pada kartu TPS di daftar untuk memindahkan fokus peta secara otomatis ke lokasi tersebut.",
+    "importantInfo": "Info Penting",
+    "importantInfoDesc": "Gunakan filter distrik dan kotak pencarian untuk mempersempit wilayah pemantauan Anda secara real-time.",
+    "needHelp": "Butuh Bantuan?",
+    "helpText": "Hubungi koordinator wilayah jika menemukan data koordinat yang tidak sesuai di lapangan."
   },
   "validation": {
     "required": "Kolom ini wajib diisi",

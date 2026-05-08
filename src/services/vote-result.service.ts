@@ -28,5 +28,10 @@ export const voteResultService = {
   update: async (id: number, payload: Partial<VoteResultFormData>): Promise<VoteResult> => {
     const { data } = await api.put<ApiResponse<VoteResult>>(`/vote-results/${id}`, payload)
     return data.data
+  },
+
+  verify: async (id: number): Promise<VoteResult> => {
+    const { data } = await api.patch<ApiResponse<VoteResult>>(`/vote-results/${id}/verify`)
+    return data.data
   }
 }
