@@ -1,0 +1,284 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: #1e40af;
+  --color-primary-dark: #1e3a8a;
+  --color-primary-light: #3b82f6;
+  --color-accent: #f59e0b;
+  --color-accent-dark: #d97706;
+  --color-accent-light: #fbbf24;
+}
+
+/* ===== Light Theme (default) ===== */
+:root {
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-text: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+  --color-input-bg: #ffffff;
+  --color-input-border: #cbd5e1;
+  --color-input-focus: #1e40af;
+  --color-sidebar-bg: #ffffff;
+  --color-sidebar-border: #e2e8f0;
+  --color-header-bg: #ffffff;
+  --color-header-border: #e2e8f0;
+  --color-card-bg: #ffffff;
+  --color-card-border: #e2e8f0;
+  --color-skeleton: #e2e8f0;
+  --color-skeleton-shine: #f1f5f9;
+  --color-overlay: rgba(15, 23, 42, 0.5);
+  --color-success: #16a34a;
+  --color-success-bg: #f0fdf4;
+  --color-warning: #d97706;
+  --color-warning-bg: #fffbeb;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fef2f2;
+  --color-info: #2563eb;
+  --color-info-bg: #eff6ff;
+}
+
+/* ===== Dark Theme ===== */
+.dark {
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-surface-hover: #334155;
+  --color-border: #334155;
+  --color-border-strong: #475569;
+  --color-text: #f1f5f9;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #64748b;
+  --color-input-bg: #1e293b;
+  --color-input-border: #475569;
+  --color-input-focus: #3b82f6;
+  --color-sidebar-bg: #1e293b;
+  --color-sidebar-border: #334155;
+  --color-header-bg: #1e293b;
+  --color-header-border: #334155;
+  --color-card-bg: #1e293b;
+  --color-card-border: #334155;
+  --color-skeleton: #334155;
+  --color-skeleton-shine: #475569;
+  --color-overlay: rgba(0, 0, 0, 0.7);
+  --color-success: #22c55e;
+  --color-success-bg: #052e16;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #451a03;
+  --color-danger: #ef4444;
+  --color-danger-bg: #450a0a;
+  --color-info: #3b82f6;
+  --color-info-bg: #172554;
+}
+
+/* ===== Base Styles ===== */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family:
+      'Inter',
+      system-ui,
+      -apple-system,
+      sans-serif;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: #1e40af;
+    color: #ffffff;
+  }
+
+  .dark ::selection {
+    background: #3b82f6;
+    color: #ffffff;
+  }
+
+  /* Focus ring utility */
+  *:focus-visible {
+    outline: 2px solid #1e40af;
+    outline-offset: 2px;
+  }
+
+  .dark *:focus-visible {
+    outline-color: #3b82f6;
+  }
+}
+
+/* ===== Overlay Scrollbar ===== */
+.scrollbar-custom {
+  overflow: overlay;
+  scrollbar-gutter: stable;
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.scrollbar-custom:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.dark .scrollbar-custom:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.dark .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* ===== Animations ===== */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-in-right {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-right {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-down {
+  0% {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progress-fill {
+  0% {
+    width: 0%;
+  }
+}
+
+@keyframes toast-progress {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.animate-slide-out-right {
+  animation: slide-out-right 0.3s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+.animate-slide-down {
+  animation: slide-down 0.2s ease-out;
+}
+
+.animate-spin {
+  animation: spin 0.8s linear infinite;
+}
+
+/* ===== Leaflet Overrides ===== */
+.leaflet-container {
+  font-family: 'Inter', system-ui, sans-serif;
+  border-radius: 12px;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .leaflet-tile-pane {
+  filter: brightness(0.8) contrast(1.1) saturate(0.8);
+}

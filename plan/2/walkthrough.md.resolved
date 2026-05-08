@@ -1,0 +1,136 @@
+# ELECTRA Frontend — Improvements Walkthrough
+
+## Changes Made
+
+### 1. ✅ Action Buttons with Lucide Icons
+**Before**: Dropdown menu (three dots) for actions
+**After**: Inline icon buttons — `Eye` (view), `Pencil` (edit), `Trash2` (delete), `CheckCircle` (confirm)
+
+- Created [action-button.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/components/ui/action-button.tsx) — `ActionButton` + `ActionGroup` components
+- 4 color variants: `default` (blue hover), `danger` (red), `success` (green), `warning` (amber)
+- Updated pages: [polling-station-management.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/pages/polling-station-management.tsx), [officers.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/pages/officers.tsx), [assignments.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/pages/assignments.tsx)
+
+---
+
+### 2. ✅ Show/Detail View for Polling Stations
+Created [polling-station-detail.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/components/polling-stations/polling-station-detail.tsx):
+- Status badge + officer count
+- Info grid (district, village, venue, address)
+- Coordinates with **Google Maps link**
+- Notes section
+- Officers list with role badges
+- Timestamps (created/updated)
+
+---
+
+### 3. ✅ Leaflet Map Picker for Lat/Lng
+Created [map-picker.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/components/polling-stations/map-picker.tsx):
+- Interactive Leaflet map centered on **Sukoharjo**
+- **Click to set location** — drops a marker
+- Shows lat/lng coordinates in real-time
+- Replaces the old manual number inputs in the form
+- Updated [polling-station-form.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/components/polling-stations/polling-station-form.tsx)
+
+---
+
+### 4. ✅ Select Dropdown Portal Fix
+Updated [select.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/components/ui/select.tsx):
+- Uses `createPortal` to render dropdown at `document.body`
+- `z-index: 9999` + `position: fixed`
+- Repositions on scroll/resize
+- **Now floats above modals and table cells**
+
+---
+
+### 5. ✅ Overlay/Floating Scrollbar
+Updated [index.css](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/index.css):
+- Scrollbar thumb is **transparent by default** → visible on hover
+- `overflow: overlay` — doesn't take up layout space
+- 5px thin, rounded
+
+---
+
+### 6. ✅ Functional Notification System
+Created:
+- [notification.store.ts](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/stores/notification.store.ts) — Zustand store with add/read/clear
+- [notification-panel.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/components/layout/notification-panel.tsx) — Panel with bell badge, unread count, type-colored icons, time formatting
+
+Updated [header.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/components/layout/header.tsx):
+- Replaced static bell with functional `NotificationPanel`
+
+**Usage**: Any component can push notifications:
+```tsx
+import { useNotificationStore } from '@/stores/notification.store'
+
+const { addNotification } = useNotificationStore()
+addNotification({ type: 'success', title: 'TPS Added', message: 'TPS 05 has been created' })
+```
+
+---
+
+### 7. 📊 How to Get Vote Data (Suara)
+
+The vote results system works via the existing backend API:
+
+#### API Endpoints
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| `GET` | `/api/vote-results` | List all vote results (paginated) |
+| `GET` | `/api/vote-results?aggregate=true` | Aggregated per-district summary |
+| `POST` | `/api/vote-results` | Submit new vote result |
+| `PUT` | `/api/vote-results/{id}` | Update vote result |
+| `GET` | `/api/vote-results/{id}` | Show single result |
+
+#### Submitting Vote Data
+To input vote results, send a `POST` to `/api/vote-results` with:
+```json
+{
+  "polling_station_id": 1,
+  "party_votes": 150,
+  "total_votes": 500,
+  "dpt": 800,
+  "voters_present": 520,
+  "verified": false
+}
+```
+
+The `submitted_by` and `submitted_at` are automatically set by the backend from the authenticated user.
+
+#### Data Flow
+```mermaid
+graph LR
+    A["Officer at TPS"] -->|"Input results"| B["POST /vote-results"]
+    B --> C["Database"]
+    C -->|"GET ?aggregate=true"| D["Aggregated View"]
+    C -->|"GET (paginated)"| E["Detailed View"]
+    D --> F["Bar Chart + District Table"]
+    E --> G["Per-TPS Table"]
+```
+
+> [!TIP]
+> The Vote Results page already has both **Aggregated View** (charts + district summary) and **Detailed View** (per-TPS table). Officers can input data via `POST /api/vote-results` from a mobile app or the dashboard form.
+
+---
+
+## Folder Structure
+
+```
+src/
+├── components/
+│   ├── common/          # Shared: StatCard, PageHeader, StatusBadge
+│   ├── layout/          # Sidebar, Header, DashboardLayout, NotificationPanel, LanguageSwitcher
+│   ├── polling-stations/ # Form, Detail, ImportModal, MapPicker
+│   └── ui/              # 21 reusable components (Button, Select, Modal, Table, etc.)
+├── hooks/               # TanStack Query hooks (dashboard, regions, stations, officers, etc.)
+├── i18n/                # EN/ID locale files + config
+├── lib/                 # utils.ts, query-keys.ts
+├── pages/               # 7 pages (login, dashboard, tps, map, officers, assignments, votes)
+├── routes/              # React Router with auth guards
+├── services/            # 7 API service modules
+├── stores/              # Zustand stores (auth, notifications)
+└── types/               # TypeScript interfaces + Zod schemas
+```
+
+## Verification
+- ✅ Vite dev server running — **0 compilation errors**
+- ✅ HMR working across all changes

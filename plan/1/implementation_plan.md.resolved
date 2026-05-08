@@ -1,0 +1,355 @@
+# ELECTRA TPS Management Frontend — Implementation Plan
+
+## Overview
+
+Build the complete frontend for ELECTRA — a TPS (Polling Station) Management Dashboard for PAN (Partai Amanat Nasional) in Sukoharjo, Indonesia. The frontend is a React 19 + TypeScript + Vite application with Tailwind CSS v4, connecting to a Laravel Sanctum backend API already running at `http://localhost:8000`.
+
+**Current state**: Frontend is nearly empty — only `main.tsx` (with a router import that doesn't exist yet) and a blank `index.css`. All code needs to be built from scratch.
+
+## Backend API Summary (Already Built)
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `POST /api/auth/login` | POST | Login (returns token) |
+| `POST /api/auth/logout` | POST | Logout |
+| `GET /api/auth/profile` | GET | Current user profile |
+| `GET /api/dashboard` | GET | Dashboard stats (total_tps, active_tps, covered_tps, total_officers, assignment_completion_rate, by_district[]) |
+| `GET /api/polling-stations` | GET | Paginated list (filters: district_id, village_id, status, search, per_page) |
+| `POST /api/polling-stations` | POST | Create station |
+| `GET /api/polling-stations/{id}` | GET | Show with assignments/vote_result |
+| `PUT /api/polling-stations/{id}` | PUT | Update station |
+| `DELETE /api/polling-stations/{id}` | DELETE | Soft delete |
+| `POST /api/polling-stations/import` | POST | Import XLS file |
+| `GET /api/polling-stations/map-data` | GET | GeoJSON map data |
+| `GET /api/polling-stations/export` | GET | Excel export |
+| `GET /api/districts` | GET | List districts |
+| `GET /api/villages` | GET | List villages |
+| `GET /api/officers` | GET | Paginated (filters: district_id, role, status, search) |
+| `POST /api/officers` | POST | Create |
+| `PUT /api/officers/{id}` | PUT | Update |
+| `DELETE /api/officers/{id}` | DELETE | Delete |
+| `GET /api/assignments` | GET | Paginated (filters: polling_station_id, officer_id, confirmation_status) |
+| `POST /api/assignments` | POST | Create |
+| `PATCH /api/assignments/{id}/confirm` | PATCH | Confirm assignment |
+| `DELETE /api/assignments/{id}` | DELETE | Delete |
+| `GET /api/vote-results` | GET | Paginated (filters: district_id, verified; `?aggregate=true` for per-district) |
+| `POST /api/vote-results` | POST | Submit result |
+| `PUT /api/vote-results/{id}` | PUT | Update result |
+
+**API Response shape**: `{ success: boolean, message: string, data: T, meta?: { current_page, last_page, per_page, total } }`
+
+**Backend Enums**:
+- `PollingStationStatus`: `active` | `inactive` | `review`
+- `OfficerRole`: `coordinator` | `kpps` | `witness` | `observer`
+- `OfficerStatus`: `active` | `inactive`
+- `ConfirmationStatus`: `confirmed` | `pending` | `absent`
+
+---
+
+## Proposed Changes
+
+### Phase 1: Foundation Layer
+
+#### [NEW] [.env](file:///c:/Experience/projects/tps-management/tps-management-frontend/.env)
+- `VITE_API_BASE_URL=http://localhost:8000/api`
+
+#### [MODIFY] [index.css](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/index.css)
+Complete Tailwind CSS v4 design system:
+- `@import 'tailwindcss'` with custom variant for dark mode
+- CSS custom properties for PAN branding (blue #1E40AF, gold #F59E0B)
+- Light/dark theme tokens (backgrounds, surfaces, borders, text)
+- Typography (Inter via Google Fonts)
+- Custom scrollbar styles
+- Animation keyframes (shimmer, slide-in, fade, scale)
+
+#### [MODIFY] [index.html](file:///c:/Experience/projects/tps-management/tps-management-frontend/index.html)
+- Add Google Fonts (Inter) preload
+- Add Leaflet CSS CDN
+- Meta description, proper title
+- Favicon
+
+#### [MODIFY] [main.tsx](file:///c:/Experience/projects/tps-management/tps-management-frontend/src/main.tsx)
+- Wrap app with `QueryClientProvider` (TanStack Query)
+- Import i18n init
+- Import index.css
+- Keep RouterProvider
+
+---
+
+### Phase 2: Types & i18n & API Services
+
+#### [NEW] `src/types/index.ts`
+All TypeScript interfaces mapped exactly to backend API responses:
+- `District` (id, code, name, geojson_key)
+- `Village` (id, district_id, code, name)
+- `PollingStation` (id, station_number, venue_name, address, district, village, status, lat, lng, notes, officer_count, assignments, vote_result)
+- `Officer` (id, name, phone, email, role, district, status, assignments_count)
+- `Assignment` (id, polling_station, officer, role, confirmation_status, notes, assigned_at, confirmed_at)
+- `VoteResult` (id, polling_station, party_votes, total_votes, dpt, voters_present, submitter, submitted_at, verified)
+- `DashboardStats` (total_tps, active_tps, covered_tps, total_officers, assignment_completion_rate, by_district)
+- `ApiResponse<T>`, `PaginatedResponse<T>`
+- Enums: `PollingStationStatus`, `OfficerRole`, `OfficerStatus`, `ConfirmationStatus`
+
+#### [NEW] `src/types/schemas.ts`
+Zod validation schemas for all forms:
+- `pollingStationSchema`, `officerSchema`, `assignmentSchema`, `voteResultSchema`
+
+#### [NEW] `src/i18n/index.ts`
+i18next configuration with EN/ID detection, localStorage persistence
+
+#### [NEW] `src/i18n/locales/en.json`
+Complete English translations (~200 keys): nav, common, dashboard, polling stations, officers, assignments, vote results, forms, validation messages
+
+#### [NEW] `src/i18n/locales/id.json`
+Complete Indonesian translations matching en.json
+
+#### [NEW] `src/services/api.ts`
+Axios instance with:
+- baseURL from `VITE_API_BASE_URL`
+- Request interceptor: inject Bearer token from cookie/localStorage
+- Response interceptor: 401 → redirect to login, extract error messages
+
+#### [NEW] `src/services/polling-station.service.ts`
+Typed functions: `getPollingStations(filters)`, `getPollingStation(id)`, `createPollingStation(data)`, `updatePollingStation(id, data)`, `deletePollingStation(id)`, `importPollingStations(file)`, `getMapData(filters)`, `exportPollingStations(filters)`
+
+#### [NEW] `src/services/officer.service.ts`
+`getOfficers(filters)`, `getOfficer(id)`, `createOfficer(data)`, `updateOfficer(id, data)`, `deleteOfficer(id)`
+
+#### [NEW] `src/services/assignment.service.ts`
+`getAssignments(filters)`, `createAssignment(data)`, `updateAssignment(id, data)`, `deleteAssignment(id)`, `confirmAssignment(id)`
+
+#### [NEW] `src/services/vote-result.service.ts`
+`getVoteResults(filters)`, `getVoteResultAggregation()`, `createVoteResult(data)`, `updateVoteResult(id, data)`
+
+#### [NEW] `src/services/dashboard.service.ts`
+`getDashboardStats()`
+
+#### [NEW] `src/services/region.service.ts`
+`getDistricts()`, `getVillages(districtId?)`
+
+#### [NEW] `src/lib/query-keys.ts`
+Constant query key factories for TanStack Query
+
+#### [NEW] `src/lib/utils.ts`
+Utility: `cn()` (clsx + tailwind-merge), `formatNumber()`, `formatDate()`
+
+---
+
+### Phase 3: Custom UI Component Library (`src/components/ui/`)
+
+All 20+ components, custom-built from scratch with Tailwind CSS. Every component:
+- Fully typed with TypeScript (no `any`)
+- Supports dark mode via CSS variables
+- ARIA accessible
+- Composable and reusable
+
+| File | Component | Key Features |
+|---|---|---|
+| `button.tsx` | Button | 5 variants, 3 sizes, loading spinner, icon support |
+| `input.tsx` | Input | Label, error state, icon, hint, dark mode |
+| `select.tsx` | Select | Custom dropdown, searchable, keyboard nav |
+| `modal.tsx` | Modal, ConfirmModal | Portal, backdrop blur, focus trap, ESC close, scale animation |
+| `badge.tsx` | Badge | 6 variants, dot indicator, sm/md sizes |
+| `card.tsx` | Card, CardHeader, CardBody, CardFooter | Hover lift, click, padding variants |
+| `table.tsx` | Table | Striped rows, skeleton loading, sort arrows, sticky header |
+| `dropdown.tsx` | Dropdown | Action menu, slide animation, danger items, dividers |
+| `toast.tsx` | ToastProvider, useToast | Bottom-right stack, auto-dismiss, progress bar |
+| `spinner.tsx` | Spinner | CSS-only rotating ring, 3 sizes/colors |
+| `skeleton.tsx` | Skeleton, SkeletonText, SkeletonCard, SkeletonTable | Shimmer animation |
+| `tabs.tsx` | Tabs | Line/pill variants, slide underline animation |
+| `alert.tsx` | Alert | Left border accent, matching lucide icons |
+| `progress.tsx` | Progress | Animated fill, color variants, label + percent |
+| `avatar.tsx` | Avatar | Initials fallback (auto-color by name), online dot |
+| `switch.tsx` | Switch | Slide toggle animation, label, error |
+| `checkbox.tsx` | Checkbox | Styled matching design, label, error |
+| `radio.tsx` | Radio | Styled matching design, RadioGroup |
+| `textarea.tsx` | Textarea | Label, error, hint, auto-resize option |
+| `index.ts` | Barrel export | Re-exports all components |
+
+---
+
+### Phase 4: Layout Components (`src/components/layout/`)
+
+#### [NEW] `dashboard-layout.tsx`
+- Fixed sidebar (280px) + sticky top header (64px) + scrollable main content
+- Mobile: sidebar as slide-out overlay
+- Reads dark mode from localStorage/system preference
+- Wraps children in the content area
+
+#### [NEW] `sidebar.tsx`
+- PAN logo at top (ELECTRA branding)
+- Nav items with lucide-react icons, active highlighting (blue left border + blue bg)
+- Collapsible on mobile (hamburger trigger)
+- Bottom: user info + logout button
+- i18n translated labels
+
+#### [NEW] `header.tsx`
+- Mobile hamburger menu trigger
+- Dynamic page title from route
+- Breadcrumb navigation
+- Right side: language switcher, notification bell, dark mode toggle, user avatar dropdown
+
+#### [NEW] `language-switcher.tsx`
+- Toggle button showing flag emoji + language code
+- Switches i18next locale
+- Persists choice to localStorage
+
+---
+
+### Phase 5: Pages
+
+#### [NEW] `src/pages/dashboard.tsx`
+- 4 stat cards: Total TPS, TPS with Officers (%), Total Officers, TPS Uncovered
+- Recharts BarChart: TPS per district
+- Recharts donut (PieChart): assignment status breakdown
+- Quick action links
+- Auto-refresh every 30s via TanStack Query
+
+#### [NEW] `src/pages/polling-station-management.tsx`
+- Page header with Import XLS + Add TPS buttons
+- Filter bar: District → Village (cascading) → Status → Search
+- TanStack Table: station#, district, village, venue, address, status badge, officers count, action dropdown
+- Server-side pagination
+- Row actions: View, Edit, Delete (with confirm modal)
+
+#### [NEW] `src/components/polling-stations/polling-station-form.tsx`
+- React Hook Form + Zod validation
+- Fields: district (select), village (cascading select), TPS number, venue name, address, lat/lng, status, notes
+- Used in modal for both create and edit
+
+#### [NEW] `src/components/polling-stations/import-modal.tsx`
+- react-dropzone drag & drop zone
+- File type validation (.xls/.xlsx)
+- Preview parsed count → confirm → progress bar → result summary
+
+#### [NEW] `src/pages/map-view.tsx`
+- React-Leaflet MapContainer centered on Sukoharjo (-7.6855, 110.8419)
+- GeoJSON district boundaries (colored by coverage: green/yellow/red)
+- MarkerClusterGroup for TPS markers
+- Custom colored markers (green = assigned, red = no officer, yellow = review)
+- Marker popup: station info + officers + View Details button
+- Side panel with filters: district checkboxes, status, show/hide layers, legend
+
+#### [NEW] `src/pages/officers.tsx`
+- TanStack Table: Name, Phone, Role badge, District, Status, Assignments count, Actions
+- Add/Edit officer modal with form
+- Filters: district, role, status, search
+
+#### [NEW] `src/pages/assignments.tsx`
+- TanStack Table: Officer, Station, District, Role, Status badge, Confirmed At, Actions
+- Create assignment modal (select officer + TPS + role)
+- Inline confirm/reject buttons
+- Filters: status, officer, station
+
+#### [NEW] `src/pages/vote-results.tsx`
+- TPS list with "Input Results" action
+- Quick input form modal: party_votes, total_votes, dpt, voters_present
+- Aggregated view toggle (per-district totals table)
+- Progress bar: X of total TPS submitted
+
+---
+
+### Phase 6: Hooks, Routing & State
+
+#### [NEW] `src/hooks/use-polling-stations.ts`
+`usePollingStations(filters)`, `usePollingStation(id)`, `useCreatePollingStation()`, `useUpdatePollingStation()`, `useDeletePollingStation()`, `useImportPollingStations()`
+
+#### [NEW] `src/hooks/use-officers.ts`
+`useOfficers(filters)`, `useCreateOfficer()`, `useUpdateOfficer()`, `useDeleteOfficer()`
+
+#### [NEW] `src/hooks/use-assignments.ts`
+`useAssignments(filters)`, `useCreateAssignment()`, `useConfirmAssignment()`, `useDeleteAssignment()`
+
+#### [NEW] `src/hooks/use-dashboard.ts`
+`useDashboardStats()` with 30s refetch interval
+
+#### [NEW] `src/hooks/use-map-data.ts`
+`useMapData(filters)` for map view
+
+#### [NEW] `src/hooks/use-regions.ts`
+`useDistricts()`, `useVillages(districtId)`
+
+#### [NEW] `src/hooks/use-theme.ts`
+Dark/light mode toggle, persisted to localStorage, applies `.dark` class to `<html>`
+
+#### [NEW] `src/stores/auth.store.ts`
+Zustand store (already mentioned as existing, will create if not present): `user`, `token`, `login()`, `logout()`, `isAuthenticated`
+
+#### [NEW] `src/routes/router.tsx`
+React Router v7 with:
+- `/login` — public
+- `/` — protected (DashboardLayout wrapper)
+  - `/` → Dashboard
+  - `/polling-stations` → TPS Management
+  - `/map` → Map View
+  - `/officers` → Officers
+  - `/assignments` → Assignments
+  - `/vote-results` → Vote Results
+
+#### [NEW] `src/components/common/stat-card.tsx`
+Reusable stat card with icon, label, value, trend, color variant
+
+#### [NEW] `src/components/common/page-header.tsx`
+Title + description + action buttons slot
+
+#### [NEW] `src/components/common/status-badge.tsx`
+Status-to-badge variant mapper for polling station / officer / assignment statuses
+
+#### [NEW] `src/components/common/data-table.tsx`
+Generic TanStack Table wrapper used across all pages
+
+#### [NEW] `src/pages/login.tsx`
+Login page with PAN branding, email/password form, connects to auth store
+
+---
+
+## Execution Order
+
+1. **Foundation**: `.env`, `index.css`, `index.html`, `main.tsx`, `lib/utils.ts`
+2. **Types + Schemas**: `types/index.ts`, `types/schemas.ts`
+3. **i18n**: `i18n/index.ts`, `locales/en.json`, `locales/id.json`
+4. **API Services**: `services/api.ts`, all service files, `lib/query-keys.ts`
+5. **UI Components**: All 20 components in `src/components/ui/`
+6. **Auth Store + Theme Hook**: `stores/auth.store.ts`, `hooks/use-theme.ts`
+7. **Layout**: `dashboard-layout.tsx`, `sidebar.tsx`, `header.tsx`, `language-switcher.tsx`
+8. **Common Components**: `stat-card.tsx`, `page-header.tsx`, `status-badge.tsx`, `data-table.tsx`
+9. **Hooks**: All `use-*.ts` hooks
+10. **Router**: `routes/router.tsx`
+11. **Login Page**: `pages/login.tsx`
+12. **Dashboard Page**: `pages/dashboard.tsx`
+13. **TPS Management**: `pages/polling-station-management.tsx` + form + import modal
+14. **Map View**: `pages/map-view.tsx`
+15. **Officers Page**: `pages/officers.tsx`
+16. **Assignments Page**: `pages/assignments.tsx`
+17. **Vote Results Page**: `pages/vote-results.tsx`
+
+---
+
+## Verification Plan
+
+### Automated
+- `npm run build` — verify TypeScript compilation with no errors
+- `npm run dev` — start dev server and verify all pages render
+
+### Browser Testing
+- Navigate to each page and verify:
+  - Layout renders correctly (sidebar, header, content)
+  - Dark mode toggle works
+  - Language switcher changes all visible text
+  - Tables show loading skeletons → data (if backend running)
+  - Forms validate with Zod errors
+  - Modals open/close with proper animations
+  - Map renders with markers and GeoJSON boundaries
+
+---
+
+## Open Questions
+
+> [!IMPORTANT]
+> 1. **Auth store**: Is there an existing auth store/login page, or should I create it from scratch? The `main.tsx` references `@/routes/router` which doesn't exist yet — I'll create both.
+
+> [!NOTE]
+> 2. **GeoJSON data**: For the map view, do you have Sukoharjo district boundary GeoJSON files, or should I generate placeholder boundaries? The backend has `geojson_key` on districts but no GeoJSON endpoint — I'll use a static GeoJSON file with Sukoharjo district boundaries.
+
+> [!NOTE]
+> 3. **Leaflet marker cluster types**: `react-leaflet-cluster` is already in package.json. I'll also need `@types/leaflet.markercluster` — will install it.

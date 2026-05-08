@@ -1,0 +1,85 @@
+# ELECTRA TPS Management Frontend — Task Tracker
+
+## Phase 1: Foundation ✅
+- [x] Configure `.env` with API base URL
+- [x] Implement Tailwind CSS v4 design system (`src/index.css`)
+- [x] Create utility library (`src/lib/utils.ts`)
+
+## Phase 2: Types, i18n, API Services ✅
+- [x] TypeScript types & enums (`src/types/index.ts`)
+- [x] Zod validation schemas (`src/types/schemas.ts`)
+- [x] English translations (`src/i18n/locales/en.json`)
+- [x] Indonesian translations (`src/i18n/locales/id.json`)
+- [x] i18n configuration (`src/i18n/index.ts`)
+- [x] TanStack Query key factories (`src/lib/query-keys.ts`)
+- [x] Axios API client (`src/services/api.ts`)
+- [x] Dashboard service
+- [x] Polling station service
+- [x] Officer service
+- [x] Assignment service
+- [x] Vote result service
+- [x] Region service
+
+## Phase 3: UI Component Library ✅
+- [x] Button (5 variants, 3 sizes, loading, icon)
+- [x] Input (label, error, icon, hint)
+- [x] Badge (6 variants, dot indicator)
+- [x] Select (searchable, keyboard nav)
+- [x] Card (Header, Body, Footer)
+- [x] Spinner (3 sizes, 3 colors)
+- [x] Skeleton (Text, Card, Table)
+- [x] Modal (portal, backdrop blur, focus trap, ESC)
+- [x] ConfirmModal (danger/warning/info)
+- [x] Table (sorting, skeleton loading, empty state)
+- [x] Dropdown (actions menu, dividers, danger)
+- [x] Toast (provider, auto-dismiss, progress bar)
+- [x] Tabs (line + pill variants, badge count)
+- [x] Alert (info/success/warning/error, dismissible)
+- [x] Progress (animated fill, color variants)
+- [x] Avatar (initials fallback, online indicator)
+- [x] Switch (toggle with label)
+- [x] Checkbox (check icon, label, error)
+- [x] RadioGroup (horizontal/vertical, label)
+- [x] Textarea (label, error, hint)
+- [x] Barrel export index
+
+## Phase 4: Stores, Hooks, Layout ✅
+- [x] Auth store (Zustand — login/logout/loadUser)
+- [x] Theme hook (dark/light mode)
+- [x] Dashboard hook
+- [x] Region hooks (districts, villages)
+- [x] Polling station hooks (CRUD + import + map)
+- [x] Officer hooks (CRUD)
+- [x] Assignment hooks (CRUD + confirm)
+- [x] Vote result hooks (CRUD + aggregation)
+- [x] Language switcher component
+- [x] Sidebar navigation
+- [x] Header (mobile menu, theme toggle, lang switch)
+- [x] Dashboard layout (sidebar + header + outlet)
+
+## Phase 5: Common Components ✅
+- [x] StatCard (dashboard stat display)
+- [x] PageHeader (title, description, actions)
+- [x] StatusBadge (station/officer/assignment)
+- [x] RoleBadge (coordinator/kpps/witness/observer)
+
+## Phase 6: Pages ✅
+- [x] Login page (PAN branding, split layout)
+- [x] Dashboard page (stat cards, charts, quick actions)
+- [x] TPS Management page (table, filters, CRUD, import)
+- [x] Polling station form component
+- [x] Import modal component
+- [x] Map View page (Leaflet, markers, filter sidebar)
+- [x] Officers page (table, filters, CRUD)
+- [x] Assignments page (table, confirm, create)
+- [x] Vote Results page (aggregated + detailed views)
+
+## Phase 7: Router & App Entry ✅
+- [x] React Router with auth guards
+- [x] Lazy-loaded routes with Suspense
+- [x] Updated main.tsx with providers
+
+## Phase 8: Verification ✅
+- [x] Dev server runs without compilation errors
+- [x] CSS import order fixed
+- [x] Login page renders in browser
