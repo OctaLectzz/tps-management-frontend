@@ -109,10 +109,6 @@ const ImportModal: React.FC<ImportModalProps> = ({ open, onClose }) => {
               <span className="text-2xl font-bold text-amber-500">{result.skipped}</span>
               <span className="text-xs text-(--color-text-muted)">Skipped</span>
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-2xl font-bold text-red-500">{result.errors}</span>
-              <span className="text-xs text-(--color-text-muted)">Errors</span>
-            </div>
           </div>
 
           <Button onClick={handleClose} className="mt-2">

@@ -5,7 +5,7 @@ import { PollingStationDetail } from '@/components/polling-stations/polling-stat
 import { PollingStationForm } from '@/components/polling-stations/polling-station-form'
 import { Button, ConfirmModal, Input, Modal, Select, Table, useToast, type Column } from '@/components/ui'
 import { ActionButton, ActionGroup } from '@/components/ui/action-button'
-import { useDeletePollingStation, usePollingStations } from '@/hooks/use-polling-stations'
+import { useDeletePollingStation, useExportPollingStations, usePollingStations } from '@/hooks/use-polling-stations'
 import { useDistricts, useVillages } from '@/hooks/use-regions'
 import { formatNumber } from '@/lib/utils'
 import type { PollingStation, PollingStationFilters } from '@/types'
@@ -29,38 +29,33 @@ const PollingStationManagementPage: React.FC = () => {
   const { data: districts } = useDistricts()
   const { data: villages } = useVillages(filters.district_id)
   const deleteMutation = useDeletePollingStation()
+  const exportMutation = useExportPollingStations()
 
-  const handleExport = () => {
-    if (!data?.data) return
+  const handleExport = async () => {
+    try {
+      const blob = await exportMutation.mutateAsync(filters)
 
-    // Create CSV content
-    const headers = ['Station Number', 'District', 'Village', 'Venue Name', 'Address', 'Status', 'Latitude', 'Longitude', 'Officers Count']
-    const rows = data.data.map((row) => [
-      `TPS ${row.station_number}`,
-      row.district.name,
-      row.village.name,
-      `"${row.venue_name || ''}"`, // wrap in quotes in case of commas
-      `"${row.address || ''}"`,
-      row.status,
-      row.latitude || '',
-      row.longitude || '',
-      row.officer_count || 0
-    ])
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `tps_export_${new Date().toISOString().split('T')[0]}.xlsx`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
 
-    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
-
-    // Create and trigger download
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute('download', `tps_export_${new Date().toISOString().split('T')[0]}.csv`)
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-
-    toast({ type: 'success', title: 'Export Successful', message: 'Data exported as CSV' })
+      toast({
+        type: 'success',
+        title: t('notifications.success'),
+        message: 'Data exported successfully'
+      })
+    } catch {
+      toast({
+        type: 'error',
+        title: t('notifications.error'),
+        message: 'Failed to export data'
+      })
+    }
   }
 
   const handleSearch = (value: string) => {
@@ -103,10 +98,15 @@ const PollingStationManagementPage: React.FC = () => {
       sortable: true
     },
     {
+      key: 'address',
+      header: t('pollingStations.address'),
+      sortable: true
+    },
+    {
       key: 'status',
       header: t('common.status'),
       width: '130px',
-      render: (val) => <StatusBadge status={String(val)} type="station" />
+      render: (val) => <StatusBadge status={String(val)} />
     },
     {
       key: 'officer_count',
@@ -161,7 +161,7 @@ const PollingStationManagementPage: React.FC = () => {
         description={t('pollingStations.description')}
         actions={
           <>
-            <Button variant="outline" icon={<Download className="h-4 w-4" />} size="sm" onClick={handleExport}>
+            <Button variant="outline" icon={<Download className="h-4 w-4" />} size="sm" onClick={handleExport} loading={exportMutation.isPending}>
               {t('pollingStations.exportXls')}
             </Button>
             <Button variant="secondary" icon={<Upload className="h-4 w-4" />} size="sm" onClick={() => setShowImport(true)}>

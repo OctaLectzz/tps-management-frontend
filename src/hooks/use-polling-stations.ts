@@ -69,3 +69,9 @@ export function useMapData(filters?: MapDataFilters) {
     queryFn: () => pollingStationService.getMapData(filters)
   })
 }
+
+export function useExportPollingStations() {
+  return useMutation({
+    mutationFn: (filters?: PollingStationFilters) => pollingStationService.export(filters)
+  })
+}
